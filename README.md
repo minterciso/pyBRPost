@@ -17,7 +17,7 @@ It requires some extra modules:
 To use this module all you need is to configure the package information and execute the get_fare()
 method. Here's a simple test:
 
-    from pybrpost import ship.fare, ship.options
+    from br_posts import fare, options
     
     tst = fare.Fare()
     tst.requestServices = [
@@ -61,7 +61,7 @@ method. Here's a simple test:
 
 This is a little big, so let's drill down this example in 3 easy steps:
 ## Import
-    from pybrpost import ship.fare, ship.options
+    from br_posts import fare, options
     
 Those are the basic imports, there's also a 'ship.errors' import that you can use to capture
 the exceptions.

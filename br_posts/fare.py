@@ -1,8 +1,8 @@
 import requests
 import xmltodict
 from datetime import datetime, timedelta
-import ship.options as options
-from ship.errors import InvalidParameterError, MissingParametersError
+import br_posts.options as options
+from br_posts.errors import InvalidParameterError, MissingParametersError
 
 
 class Fare:
@@ -125,7 +125,7 @@ class Fare:
         """
         today = datetime.today()
         ship_date = today + timedelta(days=add_days)
-        if ship_date.weekday() > 5:  # If the ship day is saturday, we can ship it (post office works on saturday)
+        if ship_date.weekday() > 5:  # If the br_posts day is saturday, we can br_posts it (post office works on saturday)
             ship_date = ship_date + timedelta(days=1)  # Otherwise add one day (skip the sunday)
         delivery_date = ship_date + timedelta(days=travel_days)
         delivery_day = delivery_date.weekday()

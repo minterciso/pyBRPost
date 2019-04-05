@@ -1,5 +1,5 @@
 class Error(Exception):
-    """Base error class for ship module"""
+    """Base error class for br_posts module"""
     def __init__(self):
         self.message = ''
 
