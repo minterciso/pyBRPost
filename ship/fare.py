@@ -2,6 +2,7 @@ import requests
 import xmltodict
 from datetime import datetime, timedelta
 import ship.options as options
+from ship.errors import InvalidParameterError, MissingParametersError
 
 
 class Fare:
@@ -9,6 +10,7 @@ class Fare:
     This class is the main class of the module and is used to query the Correios API to get predictions on both time
     needed to send the package via the service chosen and the cost you'll have.
     """
+
     def __init__(self):
         # The package size (in cm) and weight in Kg
         self.dimensions = {
@@ -28,8 +30,8 @@ class Fare:
             'receiving_warning': False,  # Set this to True if you'll need a warning of when the package was received
             'by_own_hand': False  # Set this to True if you want the user to receive on his own hand (named package)
         }
-        self.package_format = options.ObjectType.BOX  # Select the format of the package the will be sent
-        self.request_services = []  # Add all the services you want to receive a prediction
+        self.packageFormat = options.ObjectType.BOX  # Select the format of the package the will be sent
+        self.requestServices = []  # Add all the services you want to receive a prediction
         self.__payload = {}
         self.__url = 'http://ws.correios.com.br/calculador/CalcPrecoPrazo.asmx/CalcPrecoPrazo'
 
@@ -38,10 +40,34 @@ class Fare:
         Before executing the get_fare() method, use this to create the payload. If there's an error it'll raise
         an ShipException error
         """
+        # Check for errors
+        missing_parameters = []
+        if len(self.requestServices) == 0:
+            missing_parameters.append('requestServices')
+        if len(self.cepDestination) == 0:
+            missing_parameters.append('cepDestination')
+        if len(self.cepOrigin) == 0:
+            missing_parameters.append('cepOrigin')
+        if len(missing_parameters) > 0:
+            msg = 'The parameters {params} must be specified'.format(
+                params=', '.join(['\'' + x + '\'' for x in missing_parameters]))
+            raise MissingParametersError(parameters=missing_parameters, message=msg)
+        if len(self.cepOrigin) != 8:
+            raise InvalidParameterError(value=self.cepOrigin, message='invalid cepOrigin')
+        if len(self.cepDestination) != 8:
+            raise InvalidParameterError(value=self.cepDestination, message='invalid cepDestination')
+        for key, item in self.dimensions.items():
+            if item < 0:
+                raise InvalidParameterError(value=item, message='invalid value for \'{key}\''.format(key=key))
+        for key, item in self.extras.items():
+            if type(item) != bool:
+                raise InvalidParameterError(value=item, message='invalid value for \'{key}\''.format(key=key))
+
+        # Now create the payload
         self.__payload = {
             'nCdEmpresa': '',
             'sDsSenha': '',
-            'nCdServico': ','.join([x.value for x in self.request_services]),
+            'nCdServico': ','.join([x.value for x in self.requestServices]),
             'sCepOrigem': self.cepOrigin,
             'sCepDestino': self.cepDestination,
             'nVlPeso': self.dimensions['weight'],
@@ -49,7 +75,7 @@ class Fare:
             'nVlAltura': self.dimensions['height'],
             'nVlLargura': self.dimensions['width'],
             'nVlDiametro': self.dimensions['diameter'],
-            'nCdFormato': self.package_format.value,
+            'nCdFormato': self.packageFormat.value,
             'nVlValorDeclarado': self.value,
             'sCdMaoPropria': 'S' if self.extras['by_own_hand'] else 'N',
             'sCdAvisoRecebimento': 'S' if self.extras['receiving_warning'] else 'N'
