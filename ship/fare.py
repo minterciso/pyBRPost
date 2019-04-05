@@ -83,8 +83,13 @@ class Fare:
 
     def get_fare(self):
         """
+        Create the payload, and query via POST method the Correios API.
 
-        :return:
+        .. note::
+            We use the POST method instead of the XML, because the POST is the only one that actually returns
+            everything we need
+
+        :return: A list with the results of the API, where each item is a different requested service
         """
         self.__setup()
         r = requests.post(self.__url, data=self.__payload)
@@ -109,14 +114,22 @@ class Fare:
         return result
 
     @staticmethod
-    def get_estimated_delivery_day(add_days: int = 0, travel_days: int = 1, count_saturday: bool = False):
+    def get_estimated_delivery_day(add_days: int = 0, travel_days: int = 1, deliver_on_saturday: bool = False):
+        """
+        Returns an estimated delivery day. This assumes that the post office is working normally on saturdays.
+
+        :param add_days: The amount of days YOU'LL need to post the object
+        :param travel_days: How many travel days we need
+        :param deliver_on_saturday: Is it possible to deliver on a saturday
+        :return: A datetime object with the expected delivery day
+        """
         today = datetime.today()
         ship_date = today + timedelta(days=add_days)
         if ship_date.weekday() > 5:  # If the ship day is saturday, we can ship it (post office works on saturday)
             ship_date = ship_date + timedelta(days=1)  # Otherwise add one day (skip the sunday)
         delivery_date = ship_date + timedelta(days=travel_days)
         delivery_day = delivery_date.weekday()
-        if count_saturday:
+        if deliver_on_saturday:
             if delivery_day == 6:
                 delivery_date = delivery_date + timedelta(days=1)
         else:
