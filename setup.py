@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='pyBRPost',
-    version='1.0.0',
+    version='1.0.1',
     packages=setuptools.find_packages(),
     url='https://github.com/minterciso/pyBRPost',
     license='MIT License',
