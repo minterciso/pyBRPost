@@ -6,6 +6,7 @@ This module is to help whoever needs a API to query the brazilian post office to
 3. Possibility to query different shipping methods
 
 # Installation
+
 To install this module simply add it via pip
 
     pip install pyBRPost
@@ -15,6 +16,7 @@ It requires some extra modules:
     pip install requests xmltodict
     
 # Usage
+
 To use this module all you need is to configure the package information and execute the get_fare()
 method. Here's a simple test:
 
@@ -61,7 +63,9 @@ method. Here's a simple test:
             print('')
 
 This is a little big, so let's drill down this example in 3 easy steps:
+
 ## Import
+
     from br_posts import fare, options
     
 Those are the basic imports, there's also a 'ship.errors' import that you can use to capture
@@ -90,6 +94,7 @@ And those are the options you have for the ObjectType enum:
 You can find more of those options on the [Correios site](http://correios.com.br/).
 
 ## Setup
+
 After importing, you need to instantiate a 'ship.fare.Fare' object, and create the initial setup:
 
     tst = fare.Fare()
@@ -126,6 +131,7 @@ executing the get_fare() method:
 * MissingParametersError
 
 ## Getting the fare
+
 After importing and setting up the information to query, you should call the get_fare() method:
 
     try:
